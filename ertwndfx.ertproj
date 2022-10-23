@@ -1,0 +1,25 @@
+﻿CompileAll = true
+Subsystem = "library"
+UseVersionDefines = true
+"-arm" {
+	OutputName = "ertwndfx_arm"
+}
+"-arm64" {
+	OutputName = "ertwndfx_arm64"
+}
+VersionInformation {
+	ApplicationIdentifier = "WindowEffectExtension"
+	ApplicationName = "Engine Runtime Window Effect Extension"
+	CompanyIdentifier = "EngineSoftware"
+	CompanyName = "Engine Software"
+	Copyright = "© Engine Software. 2022"
+	Description = "Enables transparect and blurred background on Windows 10+."
+	InternalName = "ertwndfx"
+	Version = "1.8.0.1"
+}
+"-x64" {
+	OutputName = "ertwndfx_x64"
+}
+"-x86" {
+	OutputName = "ertwndfx_x86"
+}
