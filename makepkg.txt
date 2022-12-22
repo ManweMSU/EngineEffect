@@ -1,0 +1,20 @@
+﻿set metadata include
+set format e64
+set notation binary
+
+append "_build/windows_x86_release/*"
+append "_build/windows_x64_release/*"
+append "_build/windows_arm_release/*"
+append "_build/windows_arm64_release/*"
+select
+attr set "System" "Windows"
+
+set extended yes
+set time c unset
+set time a unset
+set time m unset
+set chain lzw huffman
+set block 0x10000
+set quality e
+
+arc
