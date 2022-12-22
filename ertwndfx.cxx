@@ -362,7 +362,7 @@ public:
 
 typedef EngineEffectLayers * HLAYERS;
 
-ENGINE_EXPORT_API BOOL WINAPI EngineEffectInit(void)
+ENGINE_EXPORT_API BOOL EngineEffectInit(void)
 {
 	if (!controller) {
 		DispatcherQueueOptions options;
@@ -373,26 +373,26 @@ ENGINE_EXPORT_API BOOL WINAPI EngineEffectInit(void)
 	}
 	return TRUE;
 }
-ENGINE_EXPORT_API HLAYERS WINAPI EngineEffectCreateLayers(const CreateEngineEffectLayersDesc * desc)
+ENGINE_EXPORT_API HLAYERS EngineEffectCreateLayers(const CreateEngineEffectLayersDesc * desc)
 {
 	try {
 		auto result = new EngineEffectLayers(*desc);
 		return result;
 	} catch (...) { return 0; }
 }
-ENGINE_EXPORT_API BOOL WINAPI EngineEffectResizeLayers(HLAYERS layers, uint width, uint height)
+ENGINE_EXPORT_API BOOL EngineEffectResizeLayers(HLAYERS layers, uint width, uint height)
 {
 	if (layers) return layers->ResizeLayers(width, height);
 	else return FALSE;
 }
-ENGINE_EXPORT_API VOID WINAPI EngineEffectRetainLayers(HLAYERS layers) { if (layers) layers->Retain(); }
-ENGINE_EXPORT_API VOID WINAPI EngineEffectReleaseLayers(HLAYERS layers) { if (layers) layers->Release(); }
-ENGINE_EXPORT_API BOOL WINAPI EngineEffectBeginDraw(HLAYERS layers, ID3D11Texture2D ** surface, uint * orgx, uint * orgy)
+ENGINE_EXPORT_API VOID EngineEffectRetainLayers(HLAYERS layers) { if (layers) layers->Retain(); }
+ENGINE_EXPORT_API VOID EngineEffectReleaseLayers(HLAYERS layers) { if (layers) layers->Release(); }
+ENGINE_EXPORT_API BOOL EngineEffectBeginDraw(HLAYERS layers, ID3D11Texture2D ** surface, uint * orgx, uint * orgy)
 {
 	if (layers) return layers->BeginDraw(surface, *orgx, *orgy);
 	else return FALSE;
 }
-ENGINE_EXPORT_API BOOL WINAPI EngineEffectEndDraw(HLAYERS layers)
+ENGINE_EXPORT_API BOOL EngineEffectEndDraw(HLAYERS layers)
 {
 	if (layers) return layers->EndDraw();
 	else return FALSE;
