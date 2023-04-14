@@ -1,6 +1,7 @@
 #include <EngineRuntime.h>
 
 #include <Windows.h>
+#include <dwmapi.h>
 #include <d3d11.h>
 #include <d2d1.h>
 #include <d2d1_1.h>
@@ -15,6 +16,7 @@
 #pragma comment(lib, "CoreMessaging.lib")
 #pragma comment(lib, "RuntimeObject.lib")
 #pragma comment(lib, "windowsapp.lib")
+#pragma comment(lib, "dwmapi.lib")
 
 using namespace Engine;
 using namespace winrt::Windows::UI::Composition;
@@ -291,6 +293,10 @@ class EngineEffectLayers : public Object
 public:
 	EngineEffectLayers(const CreateEngineEffectLayersDesc & desc) : compositor(nullptr), target(nullptr), device(nullptr), drawing(nullptr), drawing_interop(nullptr)
 	{
+		OSVERSIONINFOW osv;
+		ZeroMemory(&osv, sizeof(osv));
+		osv.dwOSVersionInfoSize = sizeof(osv);
+		GetVersionExW(&osv);
 		compositor = Compositor();
 		auto winapi_interop = compositor.as<Composition::Desktop::ICompositorDesktopInterop>();
 		auto device_interop = compositor.as<Composition::ICompositorInterop>();
@@ -323,14 +329,30 @@ public:
 			effect_info->SetOptimization(D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 			effect_info->SetBorderMode(D2D1_BORDER_MODE_HARD);
 			auto factory = compositor.CreateEffectFactory(effect_info_object.as<winrt::Windows::Graphics::Effects::IGraphicsEffect>());
-			auto backdrop = compositor.CreateBackdropBrush();
 			auto effect_brush = factory.CreateBrush();
-			effect_brush.SetSourceParameter(L"back", backdrop);
+			if (osv.dwBuildNumber >= 22000) {
+				auto backdrop = compositor.CreateHostBackdropBrush();
+				effect_brush.SetSourceParameter(L"back", backdrop);
+				UINT value = 1;
+				DwmSetWindowAttribute(desc.window, 16, &value, sizeof(value));
+			} else {
+				auto backdrop = compositor.CreateBackdropBrush();
+				effect_brush.SetSourceParameter(L"back", backdrop);
+			}
 			auto effect = compositor.CreateSpriteVisual();
 			effect.Offset({ 0.0, 0.0, 0.0 });
 			effect.RelativeSizeAdjustment({ 1.0, 1.0 });
 			effect.Brush(effect_brush);
 			root.Children().InsertAtBottom(effect);
+		} else if ((desc.layer_flags & CreateEngineEffectTransparentBackground) && osv.dwBuildNumber >= 22000) {
+			auto brush = compositor.CreateHostBackdropBrush();
+			auto visual = compositor.CreateSpriteVisual();
+			visual.Offset({ 0.0, 0.0, 0.0 });
+			visual.RelativeSizeAdjustment({ 1.0, 1.0 });
+			visual.Brush(brush);
+			root.Children().InsertAtBottom(visual);
+			UINT value = 1;
+			DwmSetWindowAttribute(desc.window, 16, &value, sizeof(value));
 		}
 		main.Offset({ 0.0, 0.0, 0.0 });
 		main.RelativeSizeAdjustment({ 1.0, 1.0 });
