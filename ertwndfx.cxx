@@ -334,7 +334,7 @@ public:
 				auto backdrop = compositor.CreateHostBackdropBrush();
 				effect_brush.SetSourceParameter(L"back", backdrop);
 				UINT value = 1;
-				DwmSetWindowAttribute(desc.window, 16, &value, sizeof(value));
+				DwmSetWindowAttribute(desc.window, 17, &value, sizeof(value));
 			} else {
 				auto backdrop = compositor.CreateBackdropBrush();
 				effect_brush.SetSourceParameter(L"back", backdrop);
@@ -345,14 +345,8 @@ public:
 			effect.Brush(effect_brush);
 			root.Children().InsertAtBottom(effect);
 		} else if ((desc.layer_flags & CreateEngineEffectTransparentBackground) && osv.dwBuildNumber >= 22000) {
-			auto brush = compositor.CreateHostBackdropBrush();
-			auto visual = compositor.CreateSpriteVisual();
-			visual.Offset({ 0.0, 0.0, 0.0 });
-			visual.RelativeSizeAdjustment({ 1.0, 1.0 });
-			visual.Brush(brush);
-			root.Children().InsertAtBottom(visual);
 			UINT value = 1;
-			DwmSetWindowAttribute(desc.window, 16, &value, sizeof(value));
+			DwmSetWindowAttribute(desc.window, 38, &value, sizeof(value));
 		}
 		main.Offset({ 0.0, 0.0, 0.0 });
 		main.RelativeSizeAdjustment({ 1.0, 1.0 });
