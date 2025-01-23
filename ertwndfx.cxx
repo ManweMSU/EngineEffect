@@ -27,6 +27,8 @@ using namespace ABI::Windows::Graphics;
 
 ABI::Windows::System::IDispatcherQueueController * controller;
 
+#define NO_HOST_BACKDROP_BRUSH
+
 enum CreateEngineEffectLayersFlags : uint {
 	CreateEngineEffectTransparentBackground	= 0x0001,
 	CreateEngineEffectBlurBehind			= 0x0002,
@@ -323,6 +325,7 @@ public:
 			auto effect_info_object_unknown = effect_info.as<IUnknown>();
 			winrt::Windows::Foundation::IUnknown effect_info_object(nullptr);
 			winrt::attach_abi(effect_info_object, effect_info_object_unknown.get());
+			effect_info_object_unknown->AddRef();
 			auto source = CompositionEffectSourceParameter(L"back");
 			effect_info->SetSource(winrt::get_abi(source));
 			effect_info->SetDeviation(desc.deviation);
@@ -330,15 +333,19 @@ public:
 			effect_info->SetBorderMode(D2D1_BORDER_MODE_HARD);
 			auto factory = compositor.CreateEffectFactory(effect_info_object.as<winrt::Windows::Graphics::Effects::IGraphicsEffect>());
 			auto effect_brush = factory.CreateBrush();
+			#ifndef NO_HOST_BACKDROP_BRUSH
 			if (osv.dwBuildNumber >= 22000) {
 				auto backdrop = compositor.CreateHostBackdropBrush();
 				effect_brush.SetSourceParameter(L"back", backdrop);
 				UINT value = 1;
 				DwmSetWindowAttribute(desc.window, 17, &value, sizeof(value));
 			} else {
+			#endif
 				auto backdrop = compositor.CreateBackdropBrush();
 				effect_brush.SetSourceParameter(L"back", backdrop);
+			#ifndef NO_HOST_BACKDROP_BRUSH
 			}
+			#endif
 			auto effect = compositor.CreateSpriteVisual();
 			effect.Offset({ 0.0, 0.0, 0.0 });
 			effect.RelativeSizeAdjustment({ 1.0, 1.0 });
